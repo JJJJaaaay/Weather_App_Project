@@ -1,0 +1,164 @@
+<div class="weather-container">
+
+  <!-- HEADER / SEARCH -->
+  <div class="search-section">
+    <h1 class="app-title">🌤️ Weather Project Para Sa Pizza</h1>
+    <div class="search-box">
+      <input
+        pInputText
+        [(ngModel)]="cityName"
+        placeholder="Search city..."
+        (keyup.enter)="searchWeather()"
+        class="search-input"
+      />
+      <button
+        pButton
+        label="Search"
+        icon="pi pi-search"
+        (click)="searchWeather()"
+        [loading]="isLoading"
+        class="search-btn"
+      ></button>
+    </div>
+  </div>
+
+  <!-- MAIN SPLIT LAYOUT -->
+  <div class="main-layout" *ngIf="weatherData">
+
+    <!-- LEFT PANEL: Current Weather + History -->
+    <div class="left-panel">
+
+      <!-- City Time -->
+      <div class="city-time-card" *ngIf="cityTime">
+        <div class="time-label">
+          <i class="pi pi-clock"></i>
+          Local Time in {{ weatherData.name }}
+        </div>
+        <div class="time-display">{{ cityTime }}</div>
+        <div class="time-date">{{ cityDate }}</div>
+      </div>
+
+      <!-- Current Weather Card -->
+      <div class="weather-card">
+        <div class="weather-header">
+          <div>
+            <h2 class="city-name">{{ weatherData.name }}</h2>
+            <p class="weather-desc">{{ weatherData.weather[0].description | titlecase }}</p>
+          </div>
+          <span class="weather-icon">
+            <img src="https://openweathermap.org/img/wn/{{weatherData.weather[0].icon}}@2x.png" />
+          </span>
+        </div>
+
+        <div class="temperature">
+          {{ weatherData.main.temp | number:'1.0-0' }}°C
+        </div>
+
+        <div class="weather-details">
+          <div class="detail-card">
+            <i class="pi pi-tint" style="color: #93c5fd;"></i>
+            <span class="detail-label">Humidity</span>
+            <span class="detail-value">{{ weatherData.main.humidity }}%</span>
+          </div>
+          <div class="detail-card">
+            <i class="pi pi-send" style="color: #c084fc;"></i>
+            <span class="detail-label">Wind</span>
+            <span class="detail-value">{{ weatherData.wind.speed }} m/s</span>
+          </div>
+          <div class="detail-card">
+            <i class="pi pi-sun" style="color: #fbbf24;"></i>
+            <span class="detail-label">Feels Like</span>
+            <span class="detail-value">{{ weatherData.main.feels_like | number:'1.0-0' }}°C</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Recent Searches -->
+      
+
+    </div>
+
+    <!-- RIGHT PANEL: Hourly + Weekly Forecast -->
+    <div class="right-panel">
+
+      
+
+      <!-- Hourly Forecast -->
+      <div class="forecast-card hourly-card" *ngIf="hourlyForecast.length > 0">
+        <h3 class="forecast-title">
+          <i class="pi pi-clock"></i> Hourly Forecast
+        </h3>
+        <div class="hourly-chart">
+          <svg class="temp-line-chart" viewBox="0 0 600 80" preserveAspectRatio="none">
+            <defs>
+              <linearGradient id="lineGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" style="stop-color:#f97316;stop-opacity:1" />
+                <stop offset="100%" style="stop-color:#fb923c;stop-opacity:1" />
+              </linearGradient>
+            </defs>
+            <polyline
+              [attr.points]="hourlyChartPoints"
+              fill="none"
+              stroke="url(#lineGrad)"
+              stroke-width="2.5"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+          </svg>
+        </div>
+        <div class="hourly-scroll-wrapper">
+          <div class="hourly-list">
+            <div class="hourly-item" *ngFor="let h of hourlyForecast">
+              <span class="h-time">{{ h.time }}</span>
+              <img [src]="'https://openweathermap.org/img/wn/' + h.icon + '.png'" class="h-icon" />
+              <span class="h-rain">{{ h.pop }}%</span>
+              <span class="h-temp">{{ h.temp }}°</span>
+            </div>
+            
+          </div>
+        </div>
+      </div>
+
+      <!-- Weekly Forecast -->
+      <div class="forecast-card weekly-card" *ngIf="weeklyForecast.length > 0">
+        <h3 class="forecast-title">
+          <i class="pi pi-calendar"></i> 7-Day Forecast
+        </h3>
+        <div class="weekly-scroll-wrapper">
+          <div class="weekly-list">
+            <div class="weekly-item" *ngFor="let day of weeklyForecast; let i = index" [class.today]="i === 0">
+              <span class="w-day">{{ day.day }}</span>
+              <img [src]="'https://openweathermap.org/img/wn/' + day.icon + '.png'" class="w-icon" />
+              <span class="w-temp">{{ day.temp }}°</span>
+            </div>
+          </div>
+        </div>
+      </div>
+<div class="history-section" *ngIf="searchHistory.length > 0">
+        <div class="history-header">
+          <h3>🕐 Recent Searches</h3>
+          <button pButton label="Clear" icon="pi pi-trash"
+            class="p-button-text p-button-danger"
+            (click)="clearHistory()">
+          </button>
+        </div>
+        <div class="history-list">
+          <div
+            class="history-item"
+            *ngFor="let city of searchHistory"
+            (click)="searchFromHistory(city)">
+            <i class="pi pi-map-marker"></i>
+            {{ city }}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Empty state when no search yet -->
+  <div class="empty-state" *ngIf="!weatherData && !isLoading">
+    <div class="empty-icon">🌍</div>
+    <p>Search ka City ya kung anong trip mo</p>
+  </div>
+
+</div>
